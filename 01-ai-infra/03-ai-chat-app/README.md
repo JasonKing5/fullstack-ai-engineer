@@ -74,7 +74,7 @@ cd 03-ai-chat-app
 ---
 Step 2：安装前端依赖
 
-pnpm add ai@^5.0.0 @ai-sdk/react@^2.0.0 \
+pnpm add ai @ai-sdk/react \
 framer-motion sonner usehooks-ts \
 date-fns clsx tailwind-merge tailwindcss-animate \
 streamdown geist lucide-react \
@@ -105,8 +105,6 @@ source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install fastapi uvicorn openai python-dotenv requests pydantic
 
 pip freeze > requirements.txt
-
-▎ 关键包版本：fastapi>=0.115、openai>=1.57（v1.x SDK，stream=True 流式接口稳定）
 
 ---
 Step 5：创建 .env 文件
