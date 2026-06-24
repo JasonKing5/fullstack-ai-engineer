@@ -1,4 +1,5 @@
 import json
+import os
 import traceback
 import uuid
 from typing import Any, Callable, Dict, Mapping, Sequence
@@ -33,7 +34,7 @@ def stream_text(
 
         stream = client.chat.completions.create(
             messages=messages,
-            model="azure/gpt-5-mini",
+            model=os.getenv("MODEL_NAME", "gpt-4o-mini"),
             stream=True,
             tools=tool_definitions,
         )
