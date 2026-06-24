@@ -39,7 +39,7 @@ export const PreviewMessage = ({
             message.parts.map((part: any, index: number) => {
               if (part.type === "text") {
                 return (
-                  <div key={index} className={cn("flex flex-col gap-4", message.role === "assistant" && "prose dark:prose-invert max-w-none")}>
+                  <div key={index} className="flex flex-col gap-4">
                     <Streamdown>{part.text}</Streamdown>
                   </div>
                 );

@@ -36,7 +36,6 @@ export function Chat() {
       setInput("");
     }
   };
-
   return (
     <div className="flex flex-col min-w-0 w-full h-[calc(100dvh-52px)] bg-background">
       <div
