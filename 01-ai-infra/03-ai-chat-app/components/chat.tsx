@@ -38,10 +38,10 @@ export function Chat() {
   };
 
   return (
-    <div className="flex flex-col min-w-0 h-[calc(100dvh-52px)] bg-background">
+    <div className="flex flex-col min-w-0 w-full h-[calc(100dvh-52px)] bg-background">
       <div
         ref={messagesContainerRef}
-        className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4"
+        className="flex flex-col min-w-0 gap-6 flex-1 overflow-y-scroll pt-4 mx-auto w-full md:max-w-3xl px-4"
       >
         {messages.length === 0 && <Overview />}
 
