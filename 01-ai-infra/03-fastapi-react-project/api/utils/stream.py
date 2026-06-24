@@ -17,6 +17,7 @@ def stream_text(
 ):
     """Yield Server-Sent Events for a streaming chat completion."""
     try:
+
         def format_sse(payload: dict) -> str:
             return f"data: {json.dumps(payload, separators=(',', ':'))}\n\n"
 
@@ -32,7 +33,7 @@ def stream_text(
 
         stream = client.chat.completions.create(
             messages=messages,
-            model="gpt-4o",
+            model="azure/gpt-5-mini",
             stream=True,
             tools=tool_definitions,
         )
@@ -51,7 +52,11 @@ def stream_text(
                         yield format_sse({"type": "text-start", "id": text_stream_id})
                         text_started = True
                     yield format_sse(
-                        {"type": "text-delta", "id": text_stream_id, "delta": delta.content}
+                        {
+                            "type": "text-delta",
+                            "id": text_stream_id,
+                            "delta": delta.content,
+                        }
                     )
 
                 if delta.tool_calls:
@@ -154,7 +159,9 @@ def stream_text(
 
                 raw_arguments = state["arguments"]
                 try:
-                    parsed_arguments = json.loads(raw_arguments) if raw_arguments else {}
+                    parsed_arguments = (
+                        json.loads(raw_arguments) if raw_arguments else {}
+                    )
                 except Exception as error:
                     yield format_sse(
                         {
