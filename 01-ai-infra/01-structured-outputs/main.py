@@ -38,7 +38,7 @@ Total	408,386	358,023	1%
 """
 
 response = client.responses.parse(
-    model="azure/gpt-5-mini",
+    model="gpt-5-mini",
     input=[
         {"role": "system", "content": "Extract the event information."},
         {

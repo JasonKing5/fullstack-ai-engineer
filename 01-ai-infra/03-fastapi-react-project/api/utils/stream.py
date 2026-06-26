@@ -33,7 +33,7 @@ def stream_text(
 
         stream = client.chat.completions.create(
             messages=messages,
-            model="azure/gpt-5-mini",
+            model="gpt-5-mini",
             stream=True,
             tools=tool_definitions,
         )
