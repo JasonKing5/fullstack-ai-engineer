@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 
 # 【新引入】异步 SQLite 检查点
+# pip install aiosqlite langgraph-checkpoint-sqlite
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel, Field
