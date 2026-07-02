@@ -43,16 +43,27 @@ async def planner_node(state: AgentState):
 
 
 async def retriever_node(state: AgentState):
-    """检索节点：根据计划并发执行检索"""
+    """检索节点：根据计划执行检索"""
     print("🔎 [Retriever Node] 正在前往 Qdrant 检索财报...")
     company = state.get("company")
     queries = state.get("search_queries", [])
 
     # 工业级写法：使用 asyncio.gather 并发检索所有的关键词
-    import asyncio
+    # import asyncio
 
-    tasks = [retrieve_financial_data(company, q) for q in queries]
-    results = await asyncio.gather(*tasks)
+    # tasks = [retrieve_financial_data(company, q) for q in queries]
+    # results = await asyncio.gather(*tasks)
+
+    # 弃用 asyncio.gather 并发，改为安全的串行 for 循环，防止打垮免费数据库
+    results = []
+    for q in queries:
+        try:
+            print(f"   -> 正在检索关键词: {q}")
+            res = await retrieve_financial_data(company, q)
+            results.append(res)
+        except Exception as e:
+            print(f"   -> 关键词 {q} 检索失败: {e}")
+            results.append(f"关键词 {q} 检索失败。")
 
     # 将检索结果汇总并添加到状态的 context 列表中
     combined_context = f"【批次检索结果】:\n" + "\n---\n".join(results)

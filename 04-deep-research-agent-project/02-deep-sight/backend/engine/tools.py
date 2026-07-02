@@ -13,21 +13,26 @@ embed_model = OpenAIEmbedding(
     model="text-embedding-3-small",
 )
 
+# 2. 全局初始化数据库客户端，复用底层 TCP 连接池，防止云端限流！
+qdrant_client_sync = QdrantClient(
+    url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY, timeout=60.0
+)
+qdrant_client_async = AsyncQdrantClient(
+    url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY, timeout=60.0
+)
+
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 async def retrieve_financial_data(company: str, query: str) -> str:
     """
     防弹检索工具：带 3 次退避重试的 Qdrant 混合检索。
     """
-    client = QdrantClient(url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY)
-    aclient = AsyncQdrantClient(
-        url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY
-    )
 
+    # 直接使用全局客户端
     vector_store = QdrantVectorStore(
         collection_name="financial_reports",
-        client=client,
-        aclient=aclient,
+        client=qdrant_client_sync,
+        aclient=qdrant_client_async,
         enable_hybrid=True,
     )
 

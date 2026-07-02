@@ -1,6 +1,8 @@
 # backend/main.py
+import warnings
 from contextlib import asynccontextmanager
 
+from api.research_router import router as research_router
 from api.upload_router import router as upload_router
 from arq import create_pool
 
@@ -15,6 +17,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from psycopg_pool import AsyncConnectionPool
+
+# 屏蔽无关紧要的警告
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
 
 
 # FastAPI 生命周期管理
@@ -69,3 +74,4 @@ app.add_middleware(
 
 # 注册子路由
 app.include_router(upload_router)
+app.include_router(research_router)
