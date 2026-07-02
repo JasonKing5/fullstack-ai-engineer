@@ -1,0 +1,118 @@
+# backend/engine/nodes.py
+from config import settings
+from engine.state import AgentState
+from engine.tools import retrieve_financial_data
+from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_openai import ChatOpenAI
+from pydantic import BaseModel, Field
+
+# 实例化核心大模型
+llm = ChatOpenAI(
+    model="gpt-5-mini",
+    api_key=settings.OPENAI_API_KEY,
+    base_url=settings.OPENAI_BASE_URL,
+    temperature=0.2,
+    max_retries=3,  # Langchain 原生重试机制
+)
+
+
+# --- Planner Node 的输出约束 ---
+class PlanOutput(BaseModel):
+    search_queries: list[str] = Field(
+        description="为了回答用户问题，需要去财报中检索的 1 到 3 个具体搜索词汇。"
+    )
+
+
+async def planner_node(state: AgentState):
+    """规划节点：将用户提问拆解为专业检索词"""
+    print("🧠 [Planner Node] 正在制定检索计划...")
+    query = state.get("query")
+    company = state.get("company")
+    feedback = state.get("feedback", "")
+
+    sys_prompt = f"你是一个金融分析师。用户正在查询 {company}。请将用户的自然语言提问转化为查阅财报时用的精确关键词。"
+    if feedback:
+        sys_prompt += f"\n注意之前的失败教训/反馈：{feedback}"
+
+    structured_llm = llm.with_structured_output(PlanOutput)
+    plan: PlanOutput = await structured_llm.ainvoke(
+        [SystemMessage(content=sys_prompt), HumanMessage(content=query)]
+    )
+
+    return {"search_queries": plan.search_queries}
+
+
+async def retriever_node(state: AgentState):
+    """检索节点：根据计划并发执行检索"""
+    print("🔎 [Retriever Node] 正在前往 Qdrant 检索财报...")
+    company = state.get("company")
+    queries = state.get("search_queries", [])
+
+    # 工业级写法：使用 asyncio.gather 并发检索所有的关键词
+    import asyncio
+
+    tasks = [retrieve_financial_data(company, q) for q in queries]
+    results = await asyncio.gather(*tasks)
+
+    # 将检索结果汇总并添加到状态的 context 列表中
+    combined_context = f"【批次检索结果】:\n" + "\n---\n".join(results)
+    return {"context": [combined_context]}
+
+
+async def drafter_node(state: AgentState):
+    """起草节点：根据检索结果撰写草稿"""
+    print("✍️ [Drafter Node] 正在起草分析报告...")
+    query = state.get("query")
+    context_list = state.get("context", [])
+    full_context = "\n".join(context_list)
+
+    prompt = f"""
+    根据以下检索到的财报上下文，回答用户的问题：{query}。
+    要求排版专业，包含数据支持。
+
+    上下文：
+    {full_context}
+    """
+    res = await llm.ainvoke([HumanMessage(content=prompt)])
+
+    # 每次起草，revision_count + 1
+    current_rev = state.get("revision_count", 0)
+    return {"draft": res.content, "revision_count": current_rev + 1}
+
+
+# --- Reviewer Node 的输出约束 ---
+class ReviewOutput(BaseModel):
+    is_passed: bool = Field(description="草稿是否完美解答了用户问题且包含了具体数据？")
+    feedback: str = Field(
+        description="如果不通过，给出具体的缺失信息和改进建议；如果通过，填'无'。"
+    )
+
+
+async def reviewer_node(state: AgentState):
+    """AI 质检节点：自我反思"""
+    print("🧐 [Reviewer Node] AI 正在审查草稿质量...")
+    draft = state.get("draft")
+    query = state.get("query")
+
+    sys_prompt = "你是资深金融审计员。请审查这份研报草稿是否完美回答了用户的核心诉求，且引用的数据准确。如果过于空泛，请打回并提出需要的检索方向。"
+    structured_llm = llm.with_structured_output(ReviewOutput)
+
+    review: ReviewOutput = await structured_llm.ainvoke(
+        [
+            SystemMessage(content=sys_prompt),
+            HumanMessage(content=f"用户提问：{query}\n\n当前草稿：{draft}"),
+        ]
+    )
+
+    if not review.is_passed:
+        print(f"⚠️ 质检未通过，反馈意见: {review.feedback}")
+
+    return {"feedback": review.feedback}  # 我们通过 feedback 传递意见
+
+
+async def publish_node(state: AgentState):
+    """发布节点：被人类唤醒后执行，输出定稿"""
+    print("✅ [Publish Node] 人类审批完成，输出定稿！")
+    # 在这里可以做格式化、加水印等操作
+    final_report = f"# 深度研报：{state['company']}\n\n{state['draft']}"
+    return {"final_report": final_report}
