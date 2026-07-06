@@ -36,6 +36,7 @@ async def lifespan(app: FastAPI):
         max_size=20,
         kwargs={"autocommit": True},  # LangGraph 需要自动提交
         open=False,  # 禁止在构造时自动连接
+        check=AsyncConnectionPool.check_connection,  # 从池取连接前先验活，防 SSL 断线复用
     )
     await app.state.pg_pool.open()
 

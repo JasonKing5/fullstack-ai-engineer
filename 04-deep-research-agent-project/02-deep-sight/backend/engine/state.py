@@ -1,6 +1,5 @@
 # backend/engine/state.py
-import operator
-from typing import Annotated, List, TypedDict
+from typing import List, TypedDict
 
 
 class AgentState(TypedDict):
@@ -12,8 +11,7 @@ class AgentState(TypedDict):
     query: str  # 用户原始提问
     search_queries: List[str]  # Planner 拆解出的多个检索词
 
-    # Annotated[List, operator.add] 意味着每次写入都会附加到列表中，而不是覆盖
-    context: Annotated[List[str], operator.add]
+    context: List[str]  # 检索上下文，由 retriever_node 手动累积，支持跨问题重置
 
     draft: str  # 生成的草稿
     feedback: str  # AI Reviewer 或者 人类 给出的修改意见
