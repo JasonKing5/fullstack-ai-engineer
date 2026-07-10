@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^3.0.7",
     "@ai-sdk/openai": "^4.0.9",
     "@ai-sdk/react": "^4.0.19",
     "@base-ui/react": "^1.6.0",
