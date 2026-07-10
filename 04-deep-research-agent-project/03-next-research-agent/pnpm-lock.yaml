@@ -17,6 +17,9 @@ importers:
       '@ai-sdk/react':
         specifier: ^4.0.19
         version: 4.0.19(react@19.2.4)(zod@4.4.3)
+      '@ai-sdk/tui':
+        specifier: ^1.0.19
+        version: 1.0.19(zod@4.4.3)
       '@base-ui/react':
         specifier: ^1.6.0
         version: 1.6.0(@types/react@19.2.17)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -102,6 +105,12 @@ packages:
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
+  '@ai-sdk/gateway@4.0.15':
+    resolution: {integrity: sha512-JHvgCU4SR6OdjOI+8rxIF3zhIboFAkQ1vEa+QOIdkK5VyME1ONx8SbgM2YtnSY1DOsCtUyhd+EG876pYpRjopg==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
   '@ai-sdk/mcp@2.0.9':
     resolution: {integrity: sha512-Mokfd6Ff5QjpdftICnQ9jC9opJcUqfPE31oG9sTYiXEykj5InIt0FA+9acLtCrnM/hx3Tz2BgkNQCXibjSDhpA==}
     engines: {node: '>=22'}
@@ -139,6 +148,10 @@ packages:
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18 || ~19.0.1 || ~19.1.2 || ^19.2.1
+
+  '@ai-sdk/tui@1.0.19':
+    resolution: {integrity: sha512-g5nWl1sWswg1f9/AHzAxcAF5ExN13TOklqP8+OkHi27/rnLwiDr8+E0h/m7CPTa2Li0OSsld4yY/B0pehn/BwQ==}
+    engines: {node: '>=22'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -995,6 +1008,12 @@ packages:
 
   ai@7.0.18:
     resolution: {integrity: sha512-/DsiRfbLPtoHf9C47Hy+LK+HkjNowX1DQo3id4zWegfU6z1WjVDRAHYJAiX7SXhGp0mWX4tcenUhfIFessDWnw==}
+    engines: {node: '>=22'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  ai@7.0.19:
+    resolution: {integrity: sha512-7kxMNiy6JqCvruCY2qGMNzeqEt9Ey3XqrtYGHWyipDJTXHFN7gOyO1UR2UIXhw112vAUkrO+OJJzemKJD8P3bA==}
     engines: {node: '>=22'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -3292,6 +3311,13 @@ snapshots:
       '@vercel/oidc': 3.2.0
       zod: 4.4.3
 
+  '@ai-sdk/gateway@4.0.15(zod@4.4.3)':
+    dependencies:
+      '@ai-sdk/provider': 4.0.3
+      '@ai-sdk/provider-utils': 5.0.7(zod@4.4.3)
+      '@vercel/oidc': 3.2.0
+      zod: 4.4.3
+
   '@ai-sdk/mcp@2.0.9(zod@4.4.3)':
     dependencies:
       '@ai-sdk/provider': 4.0.2
@@ -3338,6 +3364,12 @@ snapshots:
       react: 19.2.4
       swr: 2.4.2(react@19.2.4)
       throttleit: 2.1.0
+    transitivePeerDependencies:
+      - zod
+
+  '@ai-sdk/tui@1.0.19(zod@4.4.3)':
+    dependencies:
+      ai: 7.0.19(zod@4.4.3)
     transitivePeerDependencies:
       - zod
 
@@ -4190,6 +4222,13 @@ snapshots:
       '@ai-sdk/gateway': 4.0.14(zod@4.4.3)
       '@ai-sdk/provider': 4.0.2
       '@ai-sdk/provider-utils': 5.0.6(zod@4.4.3)
+      zod: 4.4.3
+
+  ai@7.0.19(zod@4.4.3):
+    dependencies:
+      '@ai-sdk/gateway': 4.0.15(zod@4.4.3)
+      '@ai-sdk/provider': 4.0.3
+      '@ai-sdk/provider-utils': 5.0.7(zod@4.4.3)
       zod: 4.4.3
 
   ajv-formats@2.1.1(ajv@8.20.0):
